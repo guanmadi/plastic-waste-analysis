@@ -3,23 +3,94 @@ title: "plastic-waste-step-2"
 format: html
 ---
 
-## Quarto
-
-Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
-
-## Running Code
-
-When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
+# Plastic Waste - Step 2
 
 ```{r}
-1 + 1
+library(tidyverse)
 ```
 
-You can add options to executable code like this 
+## Reading in the Data
+```{r}
+plastics <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/2021/2021-01-26/plastics.csv')
+```
+
+## Proportion of Polyester Plastic Between 2019 & 2020 By Country
+*New Column: proportion of Polyester Plastics for each year*
+
+*Uses iteration, no custom function*
+```{r}
+pet_props <- plastics |> 
+  group_by(year, country) |>
+  summarize(
+   prop = sum(pet, na.rm = TRUE)/sum(grand_total, na.rm = TRUE)
+   )
+pet_props
+```
+
+*Custom Function*
+
+```{r}
+#| echo: true
+#| output: false
+Yearly_PET_Prop <- function(input_country){
+  pet_props |>
+    filter(country == input_country) 
+}
+
+countries <- plastics |> 
+  distinct(country) |>
+  pull(country)
+  
+result <- countries |>
+  map(.f = Yearly_PET_Prop) |>
+  set_names(countries)
+```
+<details> <summary>Show table output</summary>
 
 ```{r}
 #| echo: false
-2 * 2
+result
 ```
 
-The `echo: false` option disables the printing of code (only output is displayed).
+Seems like a significant reduction in Polyester Plastics collected in Argentina. 
+
+## Low & High Density Polyethylene Total Count By Year
+
+*No new columns*
+
+*Requires custom function*
+
+```{r}
+sum_pe <- function(input_country){
+  plastics |> 
+    group_by(year) |>
+    filter(country == input_country) |>
+    summarize(
+      ldpe_total = sum(ldpe, na.rm = TRUE), 
+      hdpe_total = sum(hdpe, na.rm = TRUE),                
+      .groups = "drop"
+      )
+}
+
+# Test Case
+sum_pe("Brazil")
+```
+
+*Iteration*
+```{r}
+#| echo: true
+#| output: false
+ 
+result <- countries |>
+  map(.f = sum_pe) |>
+  set_names(countries)
+
+```
+<details> <summary>Show table output</summary>
+
+```{r}
+#| echo: false
+result
+```
+
+
