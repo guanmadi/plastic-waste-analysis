@@ -1,0 +1,11 @@
+---
+title: "plastic-waste-step-3"
+format: html
+---
+
+# Plastic Waste - Step 3
+
+```{r}
+library(tidyverse)
+```
+
