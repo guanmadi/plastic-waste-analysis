@@ -107,7 +107,7 @@ gdp
 #| label: combine-temp-gdp-data
 # Keep gdp_per_capita_nominal variable
 gdp_per_capita <- gdp |>
-  select(country, year, gdp_per_capita_nominal)
+  select(country, year, gdp_nominal, gdp_per_capita_nominal)
 
 # Remove X5.yr.smooth variable from temperature data, join with gdp data set
 combined_temp_gdp <- temp |>
@@ -144,8 +144,27 @@ head(plastics_sum, 10)
 
 ```{r}
 # Combine plastics data with temp/GDP
-meta_data <- inner_join(plastics_sum, combined_temp_gdp, by = c("Country", "Code", "Year"))
+meta_data <- inner_join(plastics_sum, combined_temp_gdp, by = c("Code", "Year")) |>
+  rename(Country = Country.x) |>
+  select(-Country.y)
+
 head(meta_data, 10)
+```
+
+```{r}
+#| label: re-format-country
+#| echo: false
+#| results: false
+meta_data$Country[meta_data$Country == "NIGERIA"] <- "Nigeria"
+meta_data$Country[meta_data$Country == "ECUADOR"] <- "Ecuador"
+meta_data$Country[meta_data$Country == "Cote D_ivoire"] <- "Cote D'ivoire"
+meta_data$Country[meta_data$Country == "United Kingdom of Great Britain & Northern Ireland"] <- "United Kingdom"
+```
+
+```{r}
+#| label: write-meta
+#| eval: false
+write_csv(x = meta_data, file = "stat431-meta")
 ```
 
 ### How does annual mean temperature affect total plastic count? 
@@ -175,7 +194,7 @@ ggplot(data = meta_data, aes(x = num_events, y = grand_total, color = factor(Yea
        y = "Grand Total Plastic Count",
        title = "Grand Total Plastic Count by Number of Plastic Counting Events",
        color = "Year", 
-       size = "Nominal GDP per Capital") + 
+       size = "Nominal GDP per Capita") + 
   scale_color_manual(values = c("2019" = "steelblue", "2020" = "lightcoral")) + 
   theme_classic()
 ```
