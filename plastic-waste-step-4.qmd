@@ -34,6 +34,11 @@ plastic_temp_gdp <- plastic_temp_gdp |>
                                   destination = "continent"))
 ```
 
+```{r}
+write_csv(x = plastic_temp_gdp, file = "stat431-meta.csv")
+```
+
+
 ## RQ #1: How does change in GDP relate to change in the total amount of plastic collected?
 
 ```{r}
