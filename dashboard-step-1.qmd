@@ -1,5 +1,5 @@
 ---
-title: "Dashboard Step 1"
+title: "Plastic Waste"
 theme: cerulean
 format: 
   dashboard:
